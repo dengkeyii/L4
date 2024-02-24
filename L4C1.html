@@ -1,0 +1,47 @@
+<html><head>
+    <!-- Include Handsfree.js -->
+    <link rel="stylesheet" href="handsfree.css">
+    <script src="handsfree.js"></script>
+  </head>
+   
+  <body width="1280" height="720" class="handsfree-show-debug handsfree-model-hands handsfree-started">
+    <canvas style="display: block;position: absolute;left:0;top:0;z-index:1" id="rect" width="1280" height="720"></canvas>
+    <!-- Instantiate and start it -->
+    <script>
+      var ctx = document.querySelector("#rect").getContext("2d");
+      var rect = { color: 'green', left: 1000, top : 100, width: 200, height: 200 }
+
+      var handsfree = new Handsfree({hands: true, showDebug: true})
+
+      ctx.font = "bold 58px serif"
+      ctx.fillStyle = "green"
+      // handsfree.enablePlugins('browser')
+      handsfree.use('mainloop', {
+        onFrame (data) {
+          ctx.clearRect(0, 0, 1280, 720)
+          if (data.hands.landmarksVisible[0]) {
+            // left hand or right hand is pinching.
+            pinch = handsfree.data.hands.pinchState[1][0] || handsfree.data.hands.pinchState[0][0]
+            finger1 = { x : 1280 - data.hands.landmarks[0][8].x * 1280 , y : data.hands.landmarks[0][8].y * 720}
+
+            if (finger1.x > rect.left && finger1.x < (rect.left + rect.width) && finger1.y > rect.top && finger1.y < rect.top + rect.height) {
+              rect.color = 'red'
+              if (pinch) {
+                rect.left = finger1.x - rect.width / 2;
+                rect.top = finger1.y - rect.height / 2;
+              } else {
+                rect.color = 'green'
+              }
+            } else {
+              rect.color = 'green'
+            }
+            ctx.fillstyle = 'red'
+          }
+
+          ctx.fillStyle = rect.color
+          ctx.fillRect(rect.left, rect.top, rect.width, rect.height)
+        }
+      })
+      handsfree.start()
+    </script><div class="handsfree-debugger"><video playsinline="true" class="handsfree-video" id="handsfree-video-1" width="1280" height="720"></video><canvas class="handsfree-canvas handsfree-canvas-video handsfree-hide-when-started-without-video" id="handsfree-canvas-video-1" width="1280" height="720"></canvas><canvas class="handsfree-canvas handsfree-canvas-weboji handsfree-hide-when-started-without-weboji handsfree-canvas-webgl" id="handsfree-canvas-weboji-1" width="1280" height="720"></canvas><canvas class="handsfree-canvas handsfree-canvas-facemesh handsfree-hide-when-started-without-facemesh" id="handsfree-canvas-facemesh-1" width="1280" height="720"></canvas><canvas class="handsfree-canvas handsfree-canvas-pose handsfree-hide-when-started-without-pose" id="handsfree-canvas-pose-1" width="1280" height="720"></canvas><canvas class="handsfree-canvas handsfree-canvas-hands handsfree-hide-when-started-without-hands" id="handsfree-canvas-hands-1" width="1280" height="720"></canvas><canvas class="handsfree-canvas handsfree-canvas-handpose handsfree-hide-when-started-without-handpose handsfree-canvas-webgl" id="handsfree-canvas-handpose-1" width="1280" height="720"></canvas></div><div class="handsfree-pointer handsfree-pointer-palm handsfree-hide-when-started-without-hands handsfree-hidden"></div><div class="handsfree-pointer handsfree-pointer-palm handsfree-hide-when-started-without-hands handsfree-hidden"></div><div class="handsfree-pointer handsfree-pointer-palm handsfree-hide-when-started-without-hands handsfree-hidden"></div><div class="handsfree-pointer handsfree-pointer-palm handsfree-hide-when-started-without-hands handsfree-hidden"></div><script async="" src="https://unpkg.com/handsfree@8.5.1/build/lib/assets/@mediapipe/hands/hands.js"></script>
+  <script async="" src="https://unpkg.com/handsfree@8.5.1/build/lib/assets/@mediapipe/drawing_utils.js"></script><script src="https://unpkg.com/handsfree@8.5.1/build/lib/assets/@mediapipe/hands/hands_solution_packed_assets_loader.js" crossorigin="anonymous"></script><script src="https://unpkg.com/handsfree@8.5.1/build/lib/assets/@mediapipe/hands/hands_solution_simd_wasm_bin.js" crossorigin="anonymous"></script></body></html>
